@@ -1,0 +1,8 @@
+venv\Scripts\activate
+
+set FLASK_APP=. //old
+set FLASK_APP=app:app //new
+set FLASK_APP=app.py //brand new
+$env:FLASK_APP = "app.py"
+flask db init
+flask db migrate -m "desc"

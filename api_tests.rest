@@ -1,0 +1,25 @@
+GET http://127.0.0.1:5000/myths
+
+###
+
+POST http://127.0.0.1:5000/myths
+Content-Type: application/json
+
+{
+  "name": "ggg",
+  "nickname": "ggg of Thunder",
+  "age": 333,
+  "gender": "Female",
+  "description": "ggg desc"
+}
+
+###
+
+POST http://127.0.0.1:5000/myth_relations
+Content-Type: application/json
+
+{
+  "father_myth_id": 3,
+  "mother_myth_id": 4,
+  "child_myth_id": 5
+}
