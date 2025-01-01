@@ -8,8 +8,8 @@ root_bp = Blueprint('root_bp', __name__)
 
 @root_bp.route("", methods=["GET"])
 def get_diagram_data():
-    # Fetch all eras and their related myths
 
+    # Fetch all eras and their related myths
     nodes = []
 
     default = {
