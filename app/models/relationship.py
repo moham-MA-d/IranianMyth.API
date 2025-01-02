@@ -11,7 +11,8 @@ class Relationship(db.Model):
     end_date = db.Column(db.Date, nullable=True)
     relation_status = db.Column(db.String(20), nullable=True)  # e.g., active, ended
     description = db.Column(db.Text, nullable=True)
-    
+    points = db.Column(db.JSON, nullable=True)  # New field for link coordinates
+
     # Relationships
     myth1 = db.relationship("Myth", foreign_keys=[myth1_id], backref="relationships1")
     myth2 = db.relationship("Myth", foreign_keys=[myth2_id], backref="relationships2")

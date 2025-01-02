@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy import null, true
-from app.models import Myth, Era, ParentChild, Relationship, relationship
+from app.models import Myth, Era, ParentChild, Relationship, myth, relationship
 from app.extensions import db
 
 root_bp = Blueprint('root_bp', __name__)
@@ -77,7 +77,7 @@ def get_diagram_data():
             "to": pc.child_id,
             "relation": pc.relation_type,
             "color": pc.color,
-            "description": pc.description
+            "description": pc.description,
         }
         for pc in ParentChild.query.all()
     ]
@@ -89,7 +89,8 @@ def get_diagram_data():
             "from": rel.myth1_id,
             "to": rel.myth2_id,
             "relation": rel.relation_type,
-            "description": rel.description
+            "description": rel.description,
+            "points": rel.points
         }
         for rel in Relationship.query.all()
     ]
@@ -134,8 +135,9 @@ def copy_node():
 @root_bp.route("/moveNode", methods=["PUT"])
 def move_node():
     data = request.get_json()
-    id = data.get("id")
-    pos = data.get("loc")
+    id = data.get("nodeId")
+    pos = data.get("nodeLoc")
+    links_data = data.get("links")  # Get updated links data
 
     if not id or not pos:
         return jsonify({"isSuccess": False, "message": "Invalid input"}), 400
@@ -146,6 +148,22 @@ def move_node():
         if myth:
             myth.pos = pos
             db.session.commit()
+
+        if links_data:
+            for link in links_data:
+                link_id = link.get("id")
+                points = link.get("points")
+
+                if not link_id or not points:
+                    continue  # Skip invalid link data
+
+                # Update the link's points in the database
+                relationship = Relationship.query.filter_by(id=link_id).first()
+                if relationship:
+                    relationship.points = points  # Assuming points is stored as JSON in the database
+
+            db.session.commit()
+
             return jsonify({"isSuccess": True, "message": "Node location is updated successfully!"}), 200
 
         return jsonify({"isSuccess": False, "message": "Node not found"}), 404
@@ -193,8 +211,6 @@ def delete_node():
         return jsonify({"isSuccess": False, "message": "Failed to delete the node"}), 200
 
 
-
-
 @root_bp.route("/editLink", methods=["PUT"])
 def edit_link():
     data = request.get_json()
@@ -217,6 +233,34 @@ def edit_link():
     except Exception as e:
         return jsonify({"isSuccess": False, "message": f"An error occurred: {str(e)}"}), 500
 
+
+@root_bp.route("/drawLink", methods=["POST"])
+def draw_link():
+    data = request.get_json()
+    sourceId = data.get("sourceId")
+    targetId = data.get("targetId")
+
+    if not sourceId or not targetId:
+        return jsonify({"isSuccess": False, "message": "Invalid input"}), 400
+
+    try:
+
+        new_link = Relationship(
+            myth1_id=sourceId,
+            myth2_id=targetId,
+            relation_type="frnd",
+            relation_status="active",
+            description=""
+        )
+
+        db.session.add(new_link)
+        db.session.commit()
+        return jsonify({"isSuccess": True, "message": "New Link is created successfully!"}), 200
+
+    except Exception as e:
+        return jsonify({"isSuccess": False, "message": f"An error occurred in link creation: {str(e)}"}), 500
+
+
 @root_bp.route("/deleteLink", methods=["DELETE"])
 def delete_link():
     id = request.get_json().get("id")
@@ -229,6 +273,30 @@ def delete_link():
 
     else:
         return jsonify({"isSuccess": False, "message": "Failed to delete the link"}), 200
+
+
+@root_bp.route('/reshapeLink', methods=['POST'])
+def reshape_link():
+    data = request.json
+    source_node_id = request.get_json().get('sourceNodeId')
+    target_node_id = request.get_json().get('targetNodeId')
+    points = request.get_json().get('points')
+
+    if not (source_node_id and target_node_id and points):
+        return jsonify({"error": "Invalid data"}), 400
+
+    # Find the link in the database
+    link = Relationship.query.filter_by(
+        myth1_id=source_node_id, myth2_id=target_node_id).first()
+
+    if not link:
+        return jsonify({"error": "Link not found"}), 404
+
+    # Update the points field
+    link.points = points
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Link updated successfully"}), 200
 
 
 @root_bp.route('/saveDiagram', methods=['POST'])
