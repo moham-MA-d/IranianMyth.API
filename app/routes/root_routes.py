@@ -78,6 +78,8 @@ def get_diagram_data():
             "relation": pc.relation_type,
             "color": pc.color,
             "description": pc.description,
+            "fromSpot": pc.from_spot,
+            "toSpot": pc.to_spot
         }
         for pc in ParentChild.query.all()
     ]
@@ -90,7 +92,9 @@ def get_diagram_data():
             "to": rel.myth2_id,
             "relation": rel.relation_type,
             "description": rel.description,
-            "points": rel.points
+            "points": rel.points,
+            "fromSpot": rel.from_spot,
+            "toSpot": rel.to_spot
         }
         for rel in Relationship.query.all()
     ]
