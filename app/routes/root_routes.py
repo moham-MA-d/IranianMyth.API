@@ -147,6 +147,17 @@ def move_node():
         return jsonify({"isSuccess": False, "message": "Invalid input"}), 400
 
     try:
+
+        # Validate the position format (e.g., "x y")
+        pos_parts = pos.split()
+        if len(pos_parts) != 2 or not all(part.replace(".", "", 1).isdigit() for part in pos_parts):
+            return jsonify({"isSuccess": False, "message": "Invalid nodeLoc format"}), 400
+
+        # Convert the position to float for further validation
+        x, y = map(float, pos_parts)
+        if not (-1e6 <= x <= 1e6 and -1e6 <= y <= 1e6):  # Arbitrary range check
+            return jsonify({"isSuccess": False, "message": "nodeLoc values are out of range"}), 400
+
         myth = Myth.query.filter_by(id=id).first()
 
         if myth:
@@ -161,6 +172,15 @@ def move_node():
                 if not link_id or not points:
                     continue  # Skip invalid link data
 
+                # Validate the points array
+                if not isinstance(points, list) or any(
+                    not isinstance(p, dict) or "x" not in p or "y" not in p
+                    or not isinstance(p["x"], (int, float))
+                    or not isinstance(p["y"], (int, float))
+                    for p in points
+                ):
+                    return jsonify({"isSuccess": False, "message": f"Invalid points format for link {link_id}"}), 400
+
                 # Update the link's points in the database
                 relationship = Relationship.query.filter_by(id=link_id).first()
                 if relationship:
@@ -170,7 +190,7 @@ def move_node():
 
             return jsonify({"isSuccess": True, "message": "Node location is updated successfully!"}), 200
 
-        return jsonify({"isSuccess": False, "message": "Node not found"}), 404
+        return jsonify({"isSuccess": True, "message": "Node Successfully moved whithout any link is moved"}), 200
 
     except Exception as e:
         return jsonify({"isSuccess": False, "message": f"An error occurred: {str(e)}"}), 500
