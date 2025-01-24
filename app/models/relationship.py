@@ -12,8 +12,9 @@ class Relationship(db.Model):
     relation_status = db.Column(db.String(20), nullable=True)  # e.g., active, ended
     description = db.Column(db.Text, nullable=True)
     points = db.Column(db.JSON, nullable=True)  # New field for link coordinates
-    from_spot = db.Column(db.String(10), nullable=True, default="Bottom")  # e.g., "Top", "Left"
-    to_spot = db.Column(db.String(10), nullable=True, default="Top")  # e.g., "Bottom", "Right"
+    from_spot = db.Column(db.String(10), nullable=True, server_default="Bottom")  # e.g., "Top", "Left"
+    to_spot = db.Column(db.String(10), nullable=True, server_default="Top")  # e.g., "Bottom", "Right"
+
     # Relationships
     myth1 = db.relationship("Myth", foreign_keys=[myth1_id], backref="relationships1")
     myth2 = db.relationship("Myth", foreign_keys=[myth2_id], backref="relationships2")
