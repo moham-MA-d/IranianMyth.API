@@ -60,6 +60,7 @@ def get_diagram_data():
                 "name": myth.name,
                 "nickname": myth.nickname,
                 "age": myth.age,
+                "shape": myth.shape,
                 "gender": myth.gender,
                 "era_name": myth.era.name,
                 "description": myth.description,

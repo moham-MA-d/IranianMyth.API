@@ -13,6 +13,7 @@ class Myth(db.Model):
     gender = db.Column(db.String(10), nullable=True)
     importance = db.Column(db.String(10), nullable=True)
     khvarenah = db.Column(db.Boolean, default=False)
+    shape = db.Column(db.String(20), nullable=True, default="box-large")
     description = db.Column(db.Text, nullable=True)
     era_id = db.Column(db.String(10), db.ForeignKey('eras.id'), nullable=False)
     family_id = db.Column(db.String(10), db.ForeignKey('families.id'), nullable=False)
