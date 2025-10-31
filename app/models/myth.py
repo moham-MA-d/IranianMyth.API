@@ -5,6 +5,7 @@ class Myth(db.Model):
     __tablename__ = 'myths'
     id = db.Column(db.String(10), primary_key=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    isEnable = db.Column(db.Boolean, nullable=True)
     nickname = db.Column(db.String(100), nullable=True)
     pos = db.Column(db.String(20), nullable=True)
     imageProfile = db.Column(db.String(100), nullable=True)

@@ -49,7 +49,7 @@ def get_diagram_data():
         nodes.append(e)
 
         # Query myths that belong to the current era
-        myths_in_era = Myth.query.filter_by(era_id=era.id).all()
+        myths_in_era = Myth.query.filter_by(era_id=era.id).filter_by(isEnable = True).all()
 
         # Add each myth as a node
         for myth in myths_in_era:
@@ -67,7 +67,8 @@ def get_diagram_data():
                 "era_id": myth.era_id,
                 "family_id": myth.family_id,
                 "category_id": myth.category_id,
-                "group": myth.era.id  # Group set to the era's name for myth nodes
+                "group": myth.era.id,  # Group set to the era's name for myth nodes
+                "style": myth.family_id + '-' + myth.category_id
             }
             nodes.append(m)
 
@@ -85,6 +86,7 @@ def get_diagram_data():
         for pc in ParentChild.query.all()
     ]
 
+
     # Fetch all relationships (e.g., marriage, friendship)
     relationship_links = [
         {
@@ -97,7 +99,9 @@ def get_diagram_data():
             "fromSpot": rel.from_spot,
             "toSpot": rel.to_spot
         }
-        for rel in Relationship.query.all()
+        for rel in Relationship.query
+            #.filter(Relationship.relation_type != "enmy")
+            .all()
     ]
 
     # Combine all links
@@ -113,19 +117,25 @@ def copy_node():
     if data and 'node' in data:
         node = data['node']  # Access the 'node' dictionary
 
+        parts = node['loc'].split()
+        first_part = float(parts[0]) + 100  # Convert the first part to float and add 50
+        second_part = parts[1]  # Keep the second part as it is
+        new_loc = f"{first_part} {second_part}"
         # Create a new Myth object using the fields from the node
         new_myth = Myth(
             id=node['id'] + '1',
-            name=node['name'],
-            nickname=node['nickname'],
-            pos=node['loc'],  # Assuming 'loc' maps to 'pos'
+            name='نام',
+            nickname='',
+            pos=new_loc,  # Assuming 'loc' maps to 'pos'
             age=node['age'],
+            shape=node['shape'],
             gender=node['gender'],
             era_id=node['era_id'],
             # Use .get() in case 'category_id' is missing
             category_id=node.get('category_id'),
             # Use .get() in case 'family_id' is missing
-            family_id=node.get('family_id')
+            family_id=node.get('family_id'),
+            isEnable=True
         )
 
         # Save the new myth to the database
@@ -202,16 +212,20 @@ def edit_node():
     data = request.get_json()
     id = data.get("id")
     name = data.get("name")
+    editedId = data.get("editedId")
     description = data.get("description")
 
-    if not id or not name or not description:
+    if not id or not name :
         return jsonify({"isSuccess": False, "message": "Invalid input"}), 400
 
     try:
         myth = Myth.query.filter_by(id=id).first()
 
         if myth:
+            myth.id = editedId
             myth.name = name
+            if myth.nickname is '':
+                myth.nickname = name
             myth.description = description
             db.session.commit()
             return jsonify({"isSuccess": True, "message": "Node info is updated successfully!"}), 200
@@ -273,7 +287,7 @@ def draw_link():
         new_link = Relationship(
             myth1_id=sourceId,
             myth2_id=targetId,
-            relation_type="frnd",
+            relation_type="prnt",
             relation_status="active",
             description=""
         )
