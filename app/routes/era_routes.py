@@ -4,7 +4,7 @@ from app.models import Era
 
 era_bp = Blueprint('era_bp', __name__)
 
-@era_bp.route("/eras", methods=["POST"])
+@era_bp.route("/", methods=["POST"])
 def create_era():
     data = request.json
     
@@ -21,11 +21,9 @@ def create_era():
     db.session.commit()
     return jsonify({"message": "Era created successfully", "id": new_era.id}), 201
 
-
-
-@era_bp.route("/eras", methods=["GET"])
+@era_bp.route("/", methods=["GET"])
 def get_all_eras():
-    eras = Era.query.all()
+    eras = Era.query.order_by(Era.order).all()  # Added order_by for consistency
     return jsonify([
         {
             "id": era.id,
@@ -37,7 +35,7 @@ def get_all_eras():
         for era in eras
     ])
 
-@era_bp.route("/eras/<int:id>", methods=["GET"])
+@era_bp.route("/<int:id>", methods=["GET"])
 def get_era(id):
     era = Era.query.get_or_404(id)
     return jsonify({
@@ -48,7 +46,7 @@ def get_era(id):
         "description": era.description
     })
 
-@era_bp.route("/eras/<int:id>", methods=["PUT"])
+@era_bp.route("/<int:id>", methods=["PUT"])
 def update_era(id):
     era = Era.query.get_or_404(id)
     data = request.json
@@ -63,8 +61,7 @@ def update_era(id):
     db.session.commit()
     return jsonify({"message": "Era updated successfully"})
 
-
-@era_bp.route("/eras/<int:id>", methods=["DELETE"])
+@era_bp.route("/<int:id>", methods=["DELETE"])
 def delete_era(id):
     era = Era.query.get_or_404(id)
     db.session.delete(era)

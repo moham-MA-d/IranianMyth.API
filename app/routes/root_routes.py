@@ -214,8 +214,11 @@ def edit_node():
     name = data.get("name")
     editedId = data.get("editedId")
     description = data.get("description")
+    era_id = data.get("era_id")
+    category_id = data.get("category_id")
+    family_id = data.get("family_id")  # New: Get family_id from request
 
-    if not id or not name :
+    if not id or not name:
         return jsonify({"isSuccess": False, "message": "Invalid input"}), 400
 
     try:
@@ -224,9 +227,15 @@ def edit_node():
         if myth:
             myth.id = editedId
             myth.name = name
-            if myth.nickname is '':
+            if myth.nickname == '':
                 myth.nickname = name
             myth.description = description
+            if era_id:
+                myth.era_id = era_id
+            if category_id:
+                myth.category_id = category_id
+            if family_id:  # New: Update family_id if provided
+                myth.family_id = family_id
             db.session.commit()
             return jsonify({"isSuccess": True, "message": "Node info is updated successfully!"}), 200
 
@@ -234,7 +243,6 @@ def edit_node():
 
     except Exception as e:
         return jsonify({"isSuccess": False, "message": f"An error occurred: {str(e)}"}), 500
-
 
 @root_bp.route("/deleteNode", methods=["DELETE"])
 def delete_node():
@@ -255,15 +263,19 @@ def edit_link():
     data = request.get_json()
     id = data.get("id")
     description = data.get("description")
+    relation_type = data.get("relation_type")  # New: Get relation_type from request
 
-    if not id or not description:
+    if not id:
         return jsonify({"isSuccess": False, "message": "Invalid input"}), 400
 
     try:
         link = Relationship.query.filter_by(id=id).first()
 
         if link:
-            link.description = description
+            if description is not None:
+                link.description = description
+            if relation_type:
+                link.relation_type = relation_type  # New: Update relation_type if provided
             db.session.commit()
             return jsonify({"isSuccess": True, "message": "Link info is updated successfully!"}), 200
 
