@@ -258,12 +258,16 @@ def delete_node():
         return jsonify({"isSuccess": False, "message": "Failed to delete the node"}), 200
 
 
+# ... (other imports and routes remain the same)
+
 @root_bp.route("/editLink", methods=["PUT"])
 def edit_link():
     data = request.get_json()
     id = data.get("id")
     description = data.get("description")
     relation_type = data.get("relation_type")  # New: Get relation_type from request
+    from_spot = data.get("from_spot")          # NEW: Get from_spot
+    to_spot = data.get("to_spot")              # NEW: Get to_spot
 
     if not id:
         return jsonify({"isSuccess": False, "message": "Invalid input"}), 400
@@ -276,6 +280,10 @@ def edit_link():
                 link.description = description
             if relation_type:
                 link.relation_type = relation_type  # New: Update relation_type if provided
+            if from_spot:                           # NEW: Update from_spot if provided
+                link.from_spot = from_spot
+            if to_spot:                             # NEW: Update to_spot if provided
+                link.to_spot = to_spot
             db.session.commit()
             return jsonify({"isSuccess": True, "message": "Link info is updated successfully!"}), 200
 
@@ -284,6 +292,7 @@ def edit_link():
     except Exception as e:
         return jsonify({"isSuccess": False, "message": f"An error occurred: {str(e)}"}), 500
 
+# ... (other routes remain the same)
 
 @root_bp.route("/drawLink", methods=["POST"])
 def draw_link():
