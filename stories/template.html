@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>داستان شخصیت‌های شاهنامه</title>
+    <style>
+      :root {
+        --ink: #1f2328;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --accent: #c6b19c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Vazirmatn", "Segoe UI", Tahoma, "Iranian Sans", sans-serif;
+        color: var(--ink);
+        line-height: 2.1;
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 24px 20px 80px;
+        direction: rtl;
+        background-color: black;
+        color: #fff;
+      }
+      header.meta {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 22px;
+        background-color: #450a4f;
+      }
+      header .small{
+        color: #FFF !important;
+      }
+      header.meta h1 {
+        margin: 0 0 8px;
+        font-size: 1.7rem;
+      }
+      header.meta h1 small {
+        color: var(--muted);
+        font-size: 1rem;
+        font-weight: 400;
+      }
+      .back-button{
+        float:left;
+        background-color: #FFF;
+        padding: 3px 10px;
+        border: 2px solid black;
+        border-radius: 15px;
+      }
+      .tags {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0;
+        margin: 10px 0 0;
+      }
+      .tags li {
+        background: #f1f5f9;
+        border-radius: 999px;
+        padding: 2px 12px;
+        font-size: 0.85rem;
+        color: #334155;
+      }
+      .tags li b {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .note {
+        margin: 12px 0 0;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+      .hint {
+        color: var(--muted);
+      }
+      article.story {
+        background-color: #2b4652;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 8px 26px 26px;
+        color: #FFF;
+      }
+      article.story h2 {
+        font-size: 1.3rem;
+        color: var(--accent);
+        margin: 30px 0 6px;
+      }
+      article.story p {
+        margin: 0 0 14px;
+        text-align: justify;
+        direction: rtl !important;
+      }
+      /* Verses the frontend hides in read-mode: shown here, but visually distinct. */
+      .hidden-in-read {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="meta" id="meta">
+      <h1>داستان شخصیت‌های شاهنامه</h1>
+      <p class="note">
+        شناسهٔ شخصیت را در آدرس قرار دهید، مثلاً
+        <code>template.html?id=zal</code>.
+      </p>
+    </header>
+
+    <main id="story-root"></main>
+
+    <p class="note">
+      محتوای داخل
+      <code>&lt;article&gt;</code> همان متنی است که در ستون
+      <code>description</code> جدول <code>myths</code> ذخیره می‌شود؛ این قالب
+      فقط برای نمایش است.
+    </p>
+
+    <script>
+      // The per-character files are bare <article> fragments. This wrapper loads
+      // one by ?id= and rebuilds the header from its data-* attributes.
+      const params = new URLSearchParams(location.search);
+      const id = params.get("id") || params.get("myth");
+      const root = document.getElementById("story-root");
+      const meta = document.getElementById("meta");
+
+      function buildHeader(d) {
+        const nick = d.nickname ? ` <small class="small">(${d.nickname})</small>` : "";
+        meta.innerHTML = `
+          <h1>${d.name || id}${nick}</h1>
+          <div class="back-button"><a href="/index.html">BACK</a></div>
+          <ul class="tags">
+            <li><b>شناسه:</b> ${d.mythId || id}</li>
+            <li><b>دوران:</b> ${d.era || "—"}</li>
+            <li><b>خاندان:</b> ${d.family || "—"}</li>
+            <li><b>دسته:</b> ${d.category || "—"}</li>
+          </ul>`
+          ;
+      }
+
+      if (!id) {
+        root.innerHTML =
+          '<p class="hint">شناسه‌ای داده نشده است. نمونه: <code>template.html?id=zal</code></p>';
+      } else {
+        fetch(id + ".html")
+          .then((r) => {
+            if (!r.ok) throw new Error(r.status);
+            return r.text();
+          })
+          .then((text) => {
+            root.innerHTML = text;
+            const art = root.querySelector("article");
+            if (art) {
+              buildHeader(art.dataset);
+              document.title = (art.dataset.name || id) + " — داستان شاهنامه";
+            }
+          })
+          .catch(() => {
+            root.innerHTML =
+              '<p class="hint">«' +
+              id +
+              ".html» بارگذاری نشد. اگر فایل را مستقیم (//:file) باز کرده‌اید، یک سرور محلی اجرا کنید: <code>python -m http.server</code> و سپس از طریق <code>http://localhost:8000/</code> باز کنید.</p>";
+          });
+      }
+    </script>
+  </body>
+</html>
