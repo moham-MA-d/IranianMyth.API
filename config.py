@@ -11,7 +11,7 @@ class DevelopmentConfig(Config):  # Inherit from Config
     DEBUG = True
 
 class ProductionConfig(Config):  # Inherit from Config
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql://postgres:123qwe!@#QWEIMDB5%T@db.bgxhyccolytvimlynryr.supabase.co:5432/postgres')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgres://prod_user:prod_password@localhost/prod_db')
     DEBUG = False
 
 config_map = {
