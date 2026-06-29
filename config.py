@@ -5,11 +5,13 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):  # Inherit from Config
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgres://prod_user:prod_password@localhost/prod_db')
+    
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql://postgres:123qwe!@#QWEIMDB5%T@db.bgxhyccolytvimlynryr.supabase.co:5432/postgres')
+    # SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgres://prod_user:prod_password@localhost/prod_db')
     DEBUG = True
 
 class ProductionConfig(Config):  # Inherit from Config
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgres://prod_user:prod_password@localhost/prod_db')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql://postgres:123qwe!@#QWEIMDB5%T@db.bgxhyccolytvimlynryr.supabase.co:5432/postgres')
     DEBUG = False
 
 config_map = {
