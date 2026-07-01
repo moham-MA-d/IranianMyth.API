@@ -95,8 +95,8 @@ def create_app():
 
     # Create database tables
     with app.app_context():
-        # db.create_all()
-        upgrade()  # Automatically apply migrations on app startup
+        db.create_all()  # builds the schema from the models (fresh Supabase DB has no tables yet)
+        # upgrade()  # Automatically apply migrations on app startup
 
         if db.session.query(Era).count() == 0:
             seed_data()
