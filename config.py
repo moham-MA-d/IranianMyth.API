@@ -26,5 +26,3 @@ config_map = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
 }
-
-# $env:DATABASE_URL="postgresql://postgres.bgxhyccolytvimlynryr:h41pYQxPnIhF1eYp@aws-1-eu-central-1.pooler.supabase.com:5432/postgres"
