@@ -68,7 +68,14 @@ def get_diagram_data():
                 "family_id": myth.family_id,
                 "category_id": myth.category_id,
                 "group": myth.era.id,  # Group set to the era's name for myth nodes
-                "style": myth.family_id + '-' + myth.category_id
+                "style": myth.family_id + '-' + myth.category_id,
+                # Web reads these two additively (LOD weight + node thumbnail).
+                # importance is a String(10) numeric-ish value; web parses with Number().
+                "importance": myth.importance,
+                # imageProfile is the node's profile image (URL or relative path);
+                # None when unset. The web resolves relative paths against its own
+                # API base and renders a cheap circle for None. Never fabricate one.
+                "image": myth.imageProfile or None
             }
             nodes.append(m)
 
