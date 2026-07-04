@@ -104,7 +104,12 @@ def get_diagram_data():
             "description": rel.description,
             "points": rel.points,
             "fromSpot": rel.from_spot,
-            "toSpot": rel.to_spot
+            "toSpot": rel.to_spot,
+            "lineShape": rel.line_shape,
+            "curvature": rel.curvature,
+            "lineDash": rel.line_dash,
+            "lineWidth": rel.line_width,
+            "lineColor": rel.line_color
         }
         for rel in Relationship.query
             #.filter(Relationship.relation_type != "enmy")
@@ -275,6 +280,11 @@ def edit_link():
     relation_type = data.get("relation_type")  # New: Get relation_type from request
     from_spot = data.get("from_spot")          # NEW: Get from_spot
     to_spot = data.get("to_spot")              # NEW: Get to_spot
+    line_shape = data.get("line_shape")        # NEW: per-line appearance styling
+    curvature = data.get("curvature")
+    line_dash = data.get("line_dash")
+    line_width = data.get("line_width")
+    line_color = data.get("line_color")
 
     if not id:
         return jsonify({"isSuccess": False, "message": "Invalid input"}), 400
@@ -291,6 +301,16 @@ def edit_link():
                 link.from_spot = from_spot
             if to_spot:                             # NEW: Update to_spot if provided
                 link.to_spot = to_spot
+            if line_shape:
+                link.line_shape = line_shape
+            if curvature is not None:
+                link.curvature = curvature
+            if line_dash:
+                link.line_dash = line_dash
+            if line_width is not None:
+                link.line_width = line_width
+            if "line_color" in data:                # honor explicit null to clear override
+                link.line_color = line_color
             db.session.commit()
             return jsonify({"isSuccess": True, "message": "Link info is updated successfully!"}), 200
 

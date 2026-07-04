@@ -61,7 +61,7 @@ from config import config_map
 def create_app():
     app = Flask(__name__)
 
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}, })
     # CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}}, allow_headers=["Content-Type", "Authorization"])
 
     # Configurations
