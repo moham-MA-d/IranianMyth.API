@@ -171,13 +171,16 @@ def move_node():
 
     try:
 
-        # Validate the position format (e.g., "x y")
+        # Validate the position format (e.g., "x y"). Coordinates may be
+        # negative or decimal (e.g. "-30 70"), so parse each part with float()
+        # and reject only when there aren't exactly two parseable numbers.
         pos_parts = pos.split()
-        if len(pos_parts) != 2 or not all(part.replace(".", "", 1).isdigit() for part in pos_parts):
+        if len(pos_parts) != 2:
             return jsonify({"isSuccess": False, "message": "Invalid nodeLoc format"}), 400
-
-        # Convert the position to float for further validation
-        x, y = map(float, pos_parts)
+        try:
+            x, y = (float(part) for part in pos_parts)
+        except ValueError:
+            return jsonify({"isSuccess": False, "message": "Invalid nodeLoc format"}), 400
         if not (-1e6 <= x <= 1e6 and -1e6 <= y <= 1e6):  # Arbitrary range check
             return jsonify({"isSuccess": False, "message": "nodeLoc values are out of range"}), 400
 
