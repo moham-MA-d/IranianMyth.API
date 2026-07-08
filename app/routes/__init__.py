@@ -15,9 +15,10 @@ from .root_routes import root_bp
 from .myth_routes import myth_bp
 from .era_routes import era_bp
 from .myth_photo_routes import myth_photos_bp
-from .category_routes import category_bp  
-from .family_routes import family_bp 
+from .category_routes import category_bp
+from .family_routes import family_bp
 from .relation_type_routes import relation_type_bp  # New import
+from .upload_routes import uploads_bp
 
 def register_routes(app):
     app.register_blueprint(root_bp, url_prefix='/roots')
@@ -27,6 +28,8 @@ def register_routes(app):
     app.register_blueprint(category_bp, url_prefix='/categories')
     app.register_blueprint(family_bp, url_prefix='/families')
     app.register_blueprint(relation_type_bp, url_prefix='/relationTypes')  # New registration
+    app.register_blueprint(uploads_bp)  # no prefix: serves GET /uploads/<path>
+
 
 
    

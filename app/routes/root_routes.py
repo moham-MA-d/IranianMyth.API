@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy import null, true
-from app.models import Myth, Era, ParentChild, Relationship, myth, relationship
+from app.models import Myth, Era, MythPhoto, ParentChild, Relationship, myth, relationship
 from app.extensions import db
 
 root_bp = Blueprint('root_bp', __name__)
@@ -26,6 +26,12 @@ def get_diagram_data():
         "category": "pool"
     }
     nodes.append(default)
+
+    # Photo albums, bulk-fetched once (no per-myth query) and grouped by myth.
+    # Ordered by sort_order, so index 0 is the MAIN image (mirrors imageProfile).
+    photos_by_myth = {}
+    for p in MythPhoto.query.order_by(MythPhoto.myth_id, MythPhoto.sort_order).all():
+        photos_by_myth.setdefault(p.myth_id, []).append(p.url)
 
     allEra = Era.query.order_by(Era.order).all()
     # Loop through each era
@@ -75,7 +81,10 @@ def get_diagram_data():
                 # imageProfile is the node's profile image (URL or relative path);
                 # None when unset. The web resolves relative paths against its own
                 # API base and renders a cheap circle for None. Never fabricate one.
-                "image": myth.imageProfile or None
+                "image": myth.imageProfile or None,
+                # Full photo album (urls, main first). The web's detail panel and
+                # /myth/[id] page render these as a swipeable album.
+                "images": photos_by_myth.get(myth.id, [])
             }
             nodes.append(m)
 
