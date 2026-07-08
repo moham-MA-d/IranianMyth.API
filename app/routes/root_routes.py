@@ -232,6 +232,7 @@ def edit_node():
     era_id = data.get("era_id")
     category_id = data.get("category_id")
     family_id = data.get("family_id")  # New: Get family_id from request
+    gender = data.get("gender")  # New: Get gender from request ("1"=male, "0"=female)
 
     if not id or not name:
         return jsonify({"isSuccess": False, "message": "Invalid input"}), 400
@@ -251,6 +252,8 @@ def edit_node():
                 myth.category_id = category_id
             if family_id:  # New: Update family_id if provided
                 myth.family_id = family_id
+            if gender is not None:  # New: Update gender if provided ("0"/"1")
+                myth.gender = gender
             db.session.commit()
             return jsonify({"isSuccess": True, "message": "Node info is updated successfully!"}), 200
 
